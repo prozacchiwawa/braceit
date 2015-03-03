@@ -38,7 +38,7 @@ class PermissiveLanguageParser(Grammar):
         _lp = Keyword('(')
         _rp = Keyword(')')
         _semi = Keyword(';')
-        _ = Token(re='[^ \t\r\n;{}\\(\\)]+|;|[{]|[}]|\\(|\\)|\"(\\.|[^"])*\"')
+        _ = Token(re='[^ \t\r\n;{}\\(\\)\\"]+|;|[{]|[}]|\\(|\\)|\"(\\.|[^"])*\"')
     WHITESPACE=' \t\r\n'
     # Thanks: http://ostermiller.org/findcomment.html
     COMMENTS=Token(re='(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//[^\r\n]*)')
@@ -79,7 +79,6 @@ class PermissiveLanguageParser(Grammar):
     txunit = toplevel | toplevel + txunit
     START = txunit
 
-
 def printer(x):
     print x
 
@@ -89,7 +88,8 @@ if __name__ == '__main__':
         try:
             print '%s:' % fn
             ps = pp_strip(open(fn).read())
-            PermissiveLanguageParser.parse(ps)
+            if len(ps.strip()) != 0:
+                PermissiveLanguageParser.parse(ps)
         except Exception as e:
             traceback.print_exc()
             sys.exit(1)
