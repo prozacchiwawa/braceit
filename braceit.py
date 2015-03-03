@@ -1,3 +1,4 @@
+import re
 from lrparsing import Grammar, Prio, Ref, Token, Keyword, Tokens, Choice, TokenRegistry, repr_parse_tree
 
 def pp_strip(txt):
@@ -38,7 +39,16 @@ class PermissiveLanguageParser(Grammar):
         _lp = Keyword('(')
         _rp = Keyword(')')
         _semi = Keyword(';')
-        _ = Token(re='[^ \t\r\n;{}\\(\\)\\"]+|;|[{]|[}]|\\(|\\)|\"(\\.|[^"])*\"')
+        # Note: I've avoided using ( and ) in the regex below because they
+        # match the regexes lrparsing uses to find groups.
+        _ = Token(re='[^\'-\\* \t\r\n;\\}\\{"]+') | \
+            Token(re='(\\()|(\\))') | \
+            Token(re='\\*') | \
+            Token(re=';') | \
+            Token(re='\\{') | \
+            Token(re='\\}') | \
+            Token(re='"(\\\\.|[^"])*"') | \
+            Token(re="'(\\\\.|[^'])*'")
     WHITESPACE=' \t\r\n'
     # Thanks: http://ostermiller.org/findcomment.html
     COMMENTS=Token(re='(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//[^\r\n]*)')
