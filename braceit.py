@@ -55,15 +55,16 @@ class PermissiveLanguageParser(Grammar):
     t_any = T._ | T._lp | T._rp
     t_any_cond = T._ | T._semi
     t_any_semi = t_any | T._semi
+    body = Ref("body")
     cond_mid = Ref("cond_mid")
     cond_mid = t_any_cond | \
                t_any_cond + cond_mid | \
                T._lp + T._rp | \
                T._lp + cond_mid + T._rp | \
                T._lp + T._rp + cond_mid | \
-               T._lp + cond_mid + T._rp + cond_mid
+               T._lp + cond_mid + T._rp + cond_mid | \
+               body
     cond = T._lp + cond_mid + T._rp
-    body = Ref("body")
     stmt = Ref("stmt")
     if_stmt = Ref("if_stmt")
     if_stmt = T._if + cond + body | \
