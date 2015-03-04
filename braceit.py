@@ -121,4 +121,4 @@ if __name__ == '__main__':
     import sys, traceback
     for fn in sys.argv[1:]:
         if not parse(fn):
-            break
+            sys.exit(1)
