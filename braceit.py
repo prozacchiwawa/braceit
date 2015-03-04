@@ -91,13 +91,34 @@ class PermissiveLanguageParser(Grammar):
 def printer(x):
     print x
 
+def read_file(fn):
+    import codecs
+    data = open(fn,'rb').read()
+    if data.startswith(codecs.BOM_UTF16):
+        return codecs.encode(codecs.decode(data,'utf_16'),'utf_8')
+    else:
+        return data
+
+def parse(fn):
+    import os
+    import os.path
+    if os.path.isdir(fn):
+        sublist = [os.path.join(fn,x) for x in os.listdir(fn) if os.path.splitext(x)[1] in ['.c','.cpp','.h','.hpp','.cxx','.hxx','.cc','.hh']]
+        for fn in sublist:
+            if not parse(fn):
+                return False
+    else:
+        try:
+            ps = pp_strip(read_file(fn))
+            PermissiveLanguageParser.parse(ps)
+            return True
+        except Exception as e:
+            print '%s:' % fn
+            traceback.print_exc()
+            return False
+
 if __name__ == '__main__':
     import sys, traceback
     for fn in sys.argv[1:]:
-        try:
-            print '%s:' % fn
-            ps = pp_strip(open(fn).read())
-            PermissiveLanguageParser.parse(ps)
-        except Exception as e:
-            traceback.print_exc()
-            sys.exit(1)
+        if not parse(fn):
+            break
