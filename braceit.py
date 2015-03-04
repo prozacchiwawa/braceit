@@ -1,5 +1,5 @@
 import re
-from lrparsing import Grammar, Prio, Ref, Token, Keyword, Tokens, Choice, TokenRegistry, repr_parse_tree
+from lrparsing import Grammar, Prio, Ref, Token, Keyword, Tokens, Choice, Repeat, TokenRegistry, repr_parse_tree
 
 def pp_strip(txt):
     lines = txt.split('\n')
@@ -86,9 +86,7 @@ class PermissiveLanguageParser(Grammar):
     defn = Ref("defn")
     defn = body | t_any + defn
     toplevel = defn | decl
-    txunit = Ref("txunit")
-    txunit = toplevel | toplevel + txunit
-    START = txunit
+    START = Repeat(toplevel)
 
 def printer(x):
     print x
@@ -99,8 +97,7 @@ if __name__ == '__main__':
         try:
             print '%s:' % fn
             ps = pp_strip(open(fn).read())
-            if len(ps.strip()) != 0:
-                PermissiveLanguageParser.parse(ps)
+            PermissiveLanguageParser.parse(ps)
         except Exception as e:
             traceback.print_exc()
             sys.exit(1)
